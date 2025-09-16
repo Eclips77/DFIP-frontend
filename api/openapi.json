@@ -349,6 +349,80 @@
         }
       }
     },
+    "/api/v1/stats": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Stats",
+        "description": "Retrieve aggregated statistics for the dashboard KPI cards.\nThis endpoint uses MongoDB's aggregation framework for efficiency.",
+        "operationId": "get_stats_api_v1_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stats/over-time": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Stats Over Time",
+        "description": "Retrieve time-series data for alerts, bucketed automatically.",
+        "operationId": "get_stats_over_time_api_v1_stats_over_time_get",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "description": "Number of past days to aggregate over.",
+              "default": 7,
+              "title": "Days"
+            },
+            "description": "Number of past days to aggregate over."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimeSeriesDataPoint"
+                  },
+                  "title": "Response Get Stats Over Time Api V1 Stats Over Time Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1": {
       "get": {
         "summary": "Read Root",
@@ -510,6 +584,59 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "StatsSchema": {
+        "properties": {
+          "total_alerts": {
+            "type": "integer",
+            "title": "Total Alerts",
+            "description": "Total number of alerts in the database."
+          },
+          "alerts_24h": {
+            "type": "integer",
+            "title": "Alerts 24H",
+            "description": "Number of alerts in the last 24 hours."
+          },
+          "distinct_people": {
+            "type": "integer",
+            "title": "Distinct People",
+            "description": "Count of unique person_id values."
+          },
+          "active_cameras": {
+            "type": "integer",
+            "title": "Active Cameras",
+            "description": "Count of unique camera_id values."
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_alerts",
+          "alerts_24h",
+          "distinct_people",
+          "active_cameras"
+        ],
+        "title": "StatsSchema",
+        "description": "Pydantic model for the aggregated stats response."
+      },
+      "TimeSeriesDataPoint": {
+        "properties": {
+          "_id": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Id"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "_id",
+          "count"
+        ],
+        "title": "TimeSeriesDataPoint",
+        "description": "Pydantic model for a single data point in a time-series."
       },
       "ValidationError": {
         "properties": {
