@@ -1,0 +1,676 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Animated Dashboard API",
+    "description": "API for fetching alerts and images from MongoDB for the animated dashboard.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/alerts": {
+      "get": {
+        "tags": [
+          "Alerts"
+        ],
+        "summary": "List Alerts",
+        "description": "Retrieve a paginated and filtered list of alerts.",
+        "operationId": "list_alerts_api_v1_alerts_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Page number",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "Page number"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Items per page",
+              "default": 20,
+              "title": "Page Size"
+            },
+            "description": "Items per page"
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Start of time range (ISO format)",
+              "title": "Start Time"
+            },
+            "description": "Start of time range (ISO format)"
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "End of time range (ISO format)",
+              "title": "End Time"
+            },
+            "description": "End of time range (ISO format)"
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by alert level (alert, info, warning)",
+              "title": "Level"
+            },
+            "description": "Filter by alert level (alert, info, warning)"
+          },
+          {
+            "name": "camera_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by camera ID",
+              "title": "Camera Id"
+            },
+            "description": "Filter by camera ID"
+          },
+          {
+            "name": "person_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by person ID",
+              "title": "Person Id"
+            },
+            "description": "Filter by person ID"
+          },
+          {
+            "name": "message_search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Text search in the message field",
+              "title": "Message Search"
+            },
+            "description": "Text search in the message field"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AlertSchema"
+                  },
+                  "title": "Response List Alerts Api V1 Alerts Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts/{alert_id}": {
+      "get": {
+        "tags": [
+          "Alerts"
+        ],
+        "summary": "Get Alert",
+        "description": "Retrieve a single alert by its ID.",
+        "operationId": "get_alert_api_v1_alerts__alert_id__get",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Alert Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/images/by-image-id/{image_id}": {
+      "get": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Get Image Metadata By Image Id",
+        "description": "Retrieve GridFS file metadata using the custom `image_id` from the alert.",
+        "operationId": "get_image_metadata_by_image_id_api_v1_images_by_image_id__image_id__get",
+        "parameters": [
+          {
+            "name": "image_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Image Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GridFSFileSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/images/{file_id}/bytes": {
+      "get": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Stream Image Bytes",
+        "description": "Stream the full-size image bytes directly from GridFS.",
+        "operationId": "stream_image_bytes_api_v1_images__file_id__bytes_get",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/images/{file_id}/thumb": {
+      "get": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Stream Image Thumbnail",
+        "description": "Stream a cached thumbnail. If the thumbnail doesn't exist, it's created,\ncached in a separate GridFS bucket, and then streamed.",
+        "operationId": "stream_image_thumbnail_api_v1_images__file_id__thumb_get",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stats": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Stats",
+        "description": "Retrieve aggregated statistics for the dashboard KPI cards.\nThis endpoint uses MongoDB's aggregation framework for efficiency.",
+        "operationId": "get_stats_api_v1_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stats/over-time": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Stats Over Time",
+        "description": "Retrieve time-series data for alerts, bucketed automatically.",
+        "operationId": "get_stats_over_time_api_v1_stats_over_time_get",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "description": "Number of past days to aggregate over.",
+              "default": 7,
+              "title": "Days"
+            },
+            "description": "Number of past days to aggregate over."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimeSeriesDataPoint"
+                  },
+                  "title": "Response Get Stats Over Time Api V1 Stats Over Time Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1": {
+      "get": {
+        "summary": "Read Root",
+        "description": "A simple endpoint to confirm the API is running.",
+        "operationId": "read_root_api_v1_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AlertSchema": {
+        "properties": {
+          "_id": {
+            "type": "string",
+            "title": "Id",
+            "default": "None"
+          },
+          "person_id": {
+            "type": "string",
+            "title": "Person Id"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Time"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "alert",
+              "info",
+              "warning"
+            ],
+            "title": "Level"
+          },
+          "image_id": {
+            "type": "string",
+            "title": "Image Id"
+          },
+          "camera_id": {
+            "type": "string",
+            "title": "Camera Id"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "person_id",
+          "time",
+          "level",
+          "image_id",
+          "camera_id",
+          "message"
+        ],
+        "title": "AlertSchema",
+        "description": "Pydantic model for the 'alerts' collection documents.\nThis model is used for validation and serialization.",
+        "example": {
+          "camera_id": "123",
+          "id": "68c971856e8881dad7769617",
+          "image_id": "5af89eae-1785-52a9-8414-07f66bc6d7a1",
+          "level": "alert",
+          "message": "Person detected by camera 123.",
+          "person_id": "67862bc752f285bb212702bd25e737c7e011a3cf7f096b5c17ff3d48c6c6ac4e",
+          "time": "2025-09-16T14:17:22.494Z"
+        }
+      },
+      "GridFSFileSchema": {
+        "properties": {
+          "_id": {
+            "type": "string",
+            "title": "Id",
+            "default": "None"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/GridFSMetaDataSchema"
+          },
+          "chunkSize": {
+            "type": "integer",
+            "title": "Chunksize"
+          },
+          "length": {
+            "type": "integer",
+            "title": "Length"
+          },
+          "uploadDate": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Uploaddate"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metadata",
+          "chunkSize",
+          "length",
+          "uploadDate",
+          "filename"
+        ],
+        "title": "GridFSFileSchema",
+        "description": "Pydantic model for the 'fs.files' collection documents.",
+        "example": {
+          "chunkSize": 261120,
+          "filename": "image-642f8d06.jpg",
+          "id": "68c971cbd28b11b0e6450183",
+          "length": 8789,
+          "metadata": {
+            "event_ts": "2025-09-16T14:18:50.921Z",
+            "image_id": "642f8d06-d23f-5079-95fb-a04d88381959"
+          },
+          "uploadDate": "2025-09-16T14:18:51.051Z"
+        }
+      },
+      "GridFSMetaDataSchema": {
+        "properties": {
+          "image_id": {
+            "type": "string",
+            "title": "Image Id"
+          },
+          "event_ts": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Event Ts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "image_id",
+          "event_ts"
+        ],
+        "title": "GridFSMetaDataSchema",
+        "description": "Pydantic model for the 'metadata' sub-document within a GridFS file document."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "StatsSchema": {
+        "properties": {
+          "total_alerts": {
+            "type": "integer",
+            "title": "Total Alerts",
+            "description": "Total number of alerts in the database."
+          },
+          "alerts_24h": {
+            "type": "integer",
+            "title": "Alerts 24H",
+            "description": "Number of alerts in the last 24 hours."
+          },
+          "distinct_people": {
+            "type": "integer",
+            "title": "Distinct People",
+            "description": "Count of unique person_id values."
+          },
+          "active_cameras": {
+            "type": "integer",
+            "title": "Active Cameras",
+            "description": "Count of unique camera_id values."
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_alerts",
+          "alerts_24h",
+          "distinct_people",
+          "active_cameras"
+        ],
+        "title": "StatsSchema",
+        "description": "Pydantic model for the aggregated stats response."
+      },
+      "TimeSeriesDataPoint": {
+        "properties": {
+          "_id": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Id"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "_id",
+          "count"
+        ],
+        "title": "TimeSeriesDataPoint",
+        "description": "Pydantic model for a single data point in a time-series."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

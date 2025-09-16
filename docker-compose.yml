@@ -1,0 +1,62 @@
+version: '3.8'
+
+# =================================================================
+# == Docker Compose for Animated Dashboard Development           ==
+# =================================================================
+# This setup is optimized for local development with hot-reloading.
+#
+# To run:
+# 1. Copy .env.example to .env and configure it.
+# 2. Run `docker-compose up --build`
+#
+# Services will be available at:
+# - Frontend: http://localhost:3000
+# - Backend API: http://localhost:8000
+
+services:
+  api:
+    container_name: animated_dashboard_api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    # Mounts the local `api` directory into the container for hot-reloading.
+    volumes:
+      - ./api:/app/
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    # The default command will be specified in the Dockerfile,
+    # but could be overridden here for development if needed.
+    # For example: command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - app-network
+
+  web:
+    container_name: animated_dashboard_web
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    # Mounts the local `web` directory into the container.
+    # Anonymous volumes are used to prevent host `node_modules` and `.next`
+    # from overwriting the container's versions.
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      # This ensures the Next.js app inside the container knows how to reach the API container.
+      # It overrides any value that might be in the .env file for Docker-specific networking.
+      NEXT_PUBLIC_API_URL: http://api:8000
+    depends_on:
+      - api
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
