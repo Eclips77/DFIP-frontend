@@ -7,8 +7,8 @@ class Settings(BaseSettings):
     Application settings, loaded from environment variables.
     """
     # --- MongoDB Configuration ---
-    MONGO_URI: str
-    MONGO_DB: str
+    MONGO_URI: str = "mongodb+srv://arieltanami122_db_user:OHod6QgGER7wp09F@facedb.k2ycus.mongodb.net/?retryWrites=true&w=majority&appName=facedb"
+    MONGO_DB: str = "face_identity"
 
     # --- API Server Configuration ---
     API_PORT: int = 8000
@@ -17,8 +17,8 @@ class Settings(BaseSettings):
 
     # --- Collection & Bucket Names ---
     # Allows overriding collection names if they differ from the defaults.
-    ALERTS_COLLECTION_NAME: str = "alerts"
-    GRIDFS_BUCKET_NAME: str = "fs"
+    ALERTS_COLLECTION_NAME: str = "Event"
+    GRIDFS_BUCKET_NAME: str = "Photo_storage"
 
     # Pydantic settings configuration
     model_config = SettingsConfigDict(

@@ -3,6 +3,7 @@
 import { useGetImageMetadata } from "@/hooks/use-api";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import Image from "next/image";
 
 interface ImagePreviewModalProps {
@@ -21,15 +22,15 @@ export function ImagePreviewModal({ imageId, isOpen, onOpenChange }: ImagePrevie
           <DialogTitle>Image Preview</DialogTitle>
         </DialogHeader>
         <div className="flex h-[70vh] items-center justify-center">
-          {isLoading && <Loader2 className="h-16 w-16 animate-spin text-muted-foreground" />}
+          {isLoading && <Icon icon={Loader2} className="h-16 w-16 animate-spin text-muted-foreground" />}
           {isError && <div className="text-destructive">Failed to load image.</div>}
           {imageMetadata && (
             <div className="relative h-full w-full">
                 <Image
-                    src={`/api/v1/images/${imageMetadata.id}/bytes`}
+                    src={`http://localhost:8000/api/v1/images/by-image-id/${imageId}/thumbnail`}
                     alt={`Alert image ${imageId}`}
-                    layout="fill"
-                    objectFit="contain"
+                    fill
+                    style={{ objectFit: "contain" }}
                 />
             </div>
           )}

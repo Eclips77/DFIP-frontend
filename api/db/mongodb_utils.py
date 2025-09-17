@@ -60,8 +60,8 @@ async def create_indexes():
         await db.alerts_collection.create_index([("level", 1)])
         await db.alerts_collection.create_index([("camera_id", 1)])
         await db.alerts_collection.create_index([("person_id", 1)])
-        # Sparse unique index for image_id, as not all alerts may have an image
-        await db.alerts_collection.create_index([("image_id", 1)], unique=True, sparse=True)
+        # Index for image_id, without enforcing uniqueness as there might be duplicate references
+        await db.alerts_collection.create_index([("image_id", 1)], sparse=True)
         # Text index for message search
         await db.alerts_collection.create_index([("message", "text")])
 

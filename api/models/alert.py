@@ -8,10 +8,10 @@ class AlertSchema(BaseModel):
     Pydantic model for the 'alerts' collection documents.
     This model is used for validation and serialization.
     """
-    id: PyObjectId = Field(alias="_id", default=None)
+    id: PyObjectId = Field(alias="_id")
     person_id: str = Field(...)
     time: datetime = Field(...)
-    level: Literal["alert", "info", "warning"] = Field(...)
+    level: Literal["alert multiple", "info", "warning","alert"] = Field(...)
     image_id: str = Field(...)
     camera_id: str = Field(...)
     message: str = Field(...)
