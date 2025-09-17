@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from datetime import datetime, timedelta
@@ -38,7 +39,7 @@ async def get_stats(db_session = Depends(get_db)):
         active_cameras_task = db_session.alerts_collection.aggregate(active_cameras_pipeline).to_list(length=1)
 
         # Await all results
-        results = await db.client.gather(
+        results = await asyncio.gather(
             total_alerts_task, alerts_24h_task, distinct_people_task, active_cameras_task
         )
 
