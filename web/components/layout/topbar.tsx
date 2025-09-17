@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import ClientOnly from "../client-only";
 
 // A simple function to capitalize the first letter of a string
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -20,7 +21,9 @@ export function Topbar() {
       </div>
       <div className="flex items-center gap-4">
         {/* Other topbar items like user profile can go here */}
-        <ThemeToggle />
+        <ClientOnly>
+          <ThemeToggle />
+        </ClientOnly>
       </div>
     </header>
   );
