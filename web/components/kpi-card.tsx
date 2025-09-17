@@ -2,10 +2,17 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion, useSpring, useTransform } from "framer-motion";
-import { useEffect, useRef } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  useEffect,
+  useRef,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 
 // Custom hook for the count-up animation
-function useCountUp(end: number, duration: number = 1.5) {
+function useCountUp(end: number) {
   const count = useRef(0);
   const motionValue = useSpring(0, {
     damping: 100,
@@ -34,7 +41,7 @@ import { ArrowUpRight } from "lucide-react";
 interface KpiCardProps {
   title: string;
   value: number;
-  icon: React.ReactNode;
+  icon: ReactNode;
   description?: string;
   trend?: string;
   trendDirection?: "up" | "down";
@@ -54,7 +61,8 @@ export function KpiCard({
     <Card className="relative overflow-hidden">
       <div className="absolute right-0 top-0 -z-10 text-muted/20">
         {icon &&
-          React.cloneElement(icon as React.ReactElement, {
+          isValidElement(icon) &&
+          cloneElement(icon as ReactElement<{ className?: string }>, {
             className: "h-32 w-32",
           })}
       </div>

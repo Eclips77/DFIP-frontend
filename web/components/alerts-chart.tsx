@@ -6,8 +6,18 @@ import { useGetStatsOverTime } from "@/hooks/use-api"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMemo } from "react"
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
+type TooltipPayload = {
+  value: number
+}[]
+
+type CustomTooltipProps = {
+  active?: boolean
+  payload?: TooltipPayload
+  label?: string
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  if (active && payload && payload.length && label) {
     return (
       <div className="rounded-lg border bg-background p-2 shadow-sm">
         <div className="grid grid-cols-2 gap-2">

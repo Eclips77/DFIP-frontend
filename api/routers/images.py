@@ -86,3 +86,35 @@ async def stream_image_thumbnail(file_id: str, db_session = Depends(get_db)):
 
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"Could not find or process original image. Error: {e}")
+
+@router.get("/images/by-image-id/{image_id}/thumb")
+async def stream_image_thumbnail_by_image_id(image_id: str, db_session = Depends(get_db)):
+    """
+    Stream a thumbnail using the custom image_id from the alert.
+    First finds the file by image_id, then generates/returns the thumbnail.
+    """
+    # Find the file by image_id
+    file_doc = await db_session.db[f"{settings.GRIDFS_BUCKET_NAME}.files"].find_one({"metadata.image_id": image_id})
+    if file_doc is None:
+        raise HTTPException(status_code=404, detail=f"Image with image_id '{image_id}' not found.")
+    
+    file_id = str(file_doc["_id"])
+    
+    # Now call the existing thumbnail function
+    return await stream_image_thumbnail(file_id, db_session)
+
+@router.get("/images/debug/list")
+async def debug_list_images(db_session = Depends(get_db)):
+    """
+    Debug endpoint to see what images exist in GridFS
+    """
+    files = await db_session.db[f"{settings.GRIDFS_BUCKET_NAME}.files"].find({}).limit(10).to_list(length=10)
+    result = []
+    for file in files:
+        result.append({
+            "file_id": str(file["_id"]),
+            "filename": file.get("filename", "unknown"),
+            "metadata": file.get("metadata", {}),
+            "upload_date": file.get("uploadDate", "unknown")
+        })
+    return {"total_files": len(files), "files": result}

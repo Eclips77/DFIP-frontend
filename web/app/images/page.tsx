@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetAlerts } from "@/hooks/use-api";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
@@ -28,7 +28,15 @@ export default function ImagesPage() {
     }
   }, [inView, hasNextPage, fetchNextPage]);
 
-  const alertsWithImages = data?.pages.flatMap((page) => page).filter(alert => alert.imageId) ?? [];
+  const alerts = useMemo(
+    () => data?.pages.flatMap((page) => page) ?? [],
+    [data]
+  );
+
+  const alertsWithImages = useMemo(
+    () => alerts.filter((alert) => Boolean(alert.imageId)),
+    [alerts]
+  );
 
   if (isLoading) {
     return (
@@ -41,7 +49,8 @@ export default function ImagesPage() {
   }
 
   if (isError) {
-    return <div className="text-destructive">Error: {error.message}</div>;
+    const message = error instanceof Error ? error.message : "Failed to load images";
+    return <div className="text-destructive">Error: {message}</div>;
   }
 
   return (

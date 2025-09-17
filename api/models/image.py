@@ -13,7 +13,7 @@ class GridFSFileSchema(BaseModel):
     """
     Pydantic model for the 'fs.files' collection documents.
     """
-    id: PyObjectId = Field(alias="_id", default=None)
+    id: PyObjectId = Field(alias="_id")
     metadata: GridFSMetaDataSchema = Field(...)
     chunk_size: int = Field(..., alias="chunkSize")
     length: int = Field(...)
