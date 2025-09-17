@@ -3,11 +3,12 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useInView } from "react-intersection-observer";
+import Image from "next/image";
 
 import { useGetAlerts, type Alert } from "@/hooks/use-api";
 import { useDebounce } from "@/hooks/use-debounce";
 import { formatDateTime } from "@/lib/date-utils";
-import { ImagePreviewModal } from "./image-preview-modal";
+import { AlertImagePreviewModal } from "./alert-image-preview-modal";
 import {
   Table,
   TableBody,
@@ -62,6 +63,7 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
 
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [selectedImageAlert, setSelectedImageAlert] = useState<Alert | null>(null);
   const { ref, inView } = useInView();
 
   useEffect(() => {
@@ -136,17 +138,25 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
                 {alert.personId ? alert.personId.slice(0, 12).concat("...") : "—"}
               </TableCell>
               <TableCell className="text-center">
-                {alert.imageId && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
+                {alert.imageId ? (
+                  <div 
+                    className="relative w-12 h-12 mx-auto cursor-pointer rounded-md overflow-hidden hover:ring-2 hover:ring-primary transition-all"
                     onClick={(event) => {
                       event.stopPropagation();
                       setSelectedImageId(alert.imageId);
+                      setSelectedImageAlert(alert);
                     }}
                   >
-                    <Icon icon={ImageIcon} className="h-4 w-4" />
-                  </Button>
+                    <Image
+                      src={`http://localhost:8000/api/v1/images/by-image-id/${alert.imageId}/thumbnail`}
+                      alt={`Alert image`}
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
+                  </div>
+                ) : (
+                  <span className="text-muted-foreground text-sm">—</span>
                 )}
               </TableCell>
             </TableRow>
@@ -169,12 +179,14 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
         )}
       </div>
 
-      <ImagePreviewModal
+      <AlertImagePreviewModal
         imageId={selectedImageId}
+        alert={selectedImageAlert}
         isOpen={Boolean(selectedImageId)}
-        onOpenChange={(open) => {
+        onOpenChange={(open: boolean) => {
           if (!open) {
             setSelectedImageId(null);
+            setSelectedImageAlert(null);
           }
         }}
       />
