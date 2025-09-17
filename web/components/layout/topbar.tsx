@@ -4,9 +4,11 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Search, User, RefreshCw, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/icon";
+import { useNewDataAvailable, useManualRefresh } from "@/hooks/use-cache-management";
 
 const createTitle = (path: string) => {
   if (path === "/" || path.length <= 1) return "Mission Overview";
@@ -20,7 +22,19 @@ const createTitle = (path: string) => {
 
 export function Topbar() {
   const pathname = usePathname();
+  const { hasNewData, markDataAsViewed } = useNewDataAvailable();
+  const { refresh, isRefreshing } = useManualRefresh();
   const title = createTitle(pathname);
+
+  const handleRefresh = async () => {
+    await refresh();
+    markDataAsViewed();
+  };
+
+  const handleLoadNewData = async () => {
+    await refresh();
+    markDataAsViewed();
+  };
 
   return (
     <header className="glass-panel mx-6 mt-6 flex flex-col gap-6 border border-white/10 px-6 py-5 md:mx-12 md:flex-row md:items-center md:justify-between">
@@ -56,6 +70,40 @@ export function Topbar() {
           />
         </div>
         <div className="flex items-center justify-end gap-3">
+          {/* New Data Available Button */}
+          {hasNewData && (
+            <div className="glow-ring rounded-2xl border border-orange-500/20 bg-orange-500/10 p-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLoadNewData}
+                className="h-8 px-3 rounded-lg hover:bg-orange-500/20 transition-all text-orange-300 hover:text-orange-200"
+                title="Load new data available"
+                disabled={isRefreshing}
+              >
+                <Icon icon={Download} className="h-4 w-4 mr-2" />
+                <span className="text-xs">New Data</span>
+                <Badge variant="destructive" className="ml-2 h-4 w-4 p-0 text-xs">!</Badge>
+              </Button>
+            </div>
+          )}
+          
+          {/* Refresh Button */}
+          <div className="glow-ring rounded-2xl border border-white/10 bg-white/5 p-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRefresh}
+              className={cn(
+                "h-8 w-8 rounded-lg hover:bg-white/10 transition-all",
+                isRefreshing && "animate-spin"
+              )}
+              title="Refresh all data"
+              disabled={isRefreshing}
+            >
+              <Icon icon={RefreshCw} className="h-4 w-4" />
+            </Button>
+          </div>
           <div className="glow-ring rounded-2xl border border-white/10 bg-white/5 p-2">
             <ThemeToggle />
           </div>

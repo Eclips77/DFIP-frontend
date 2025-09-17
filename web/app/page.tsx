@@ -23,31 +23,31 @@ export default function OverviewPage() {
     {
       title: "Total Alerts",
       value: stats?.totalAlerts,
-      icon: <Bell />,
+      icon: Bell,
       description: "All alerts recorded.",
       trend: "+20.1% from last month",
     },
     {
       title: "Alerts (24h)",
       value: stats?.alerts24h,
-      icon: <AlertTriangle />,
+      icon: AlertTriangle,
       description: "Alerts in the last 24 hours.",
       trend: "+180.1% from last day",
     },
     {
       title: "Distinct People",
       value: stats?.distinctPeople,
-      icon: <Users />,
+      icon: Users,
       description: "Unique individuals detected.",
       trend: "+19% from last month",
     },
     {
       title: "Active Cameras",
       value: stats?.activeCameras,
-      icon: <Video />,
+      icon: Video,
       description: "Cameras that have sent alerts.",
       trend: "+2 since last hour",
-      trendDirection: "down",
+      trendDirection: "down" as const,
     },
   ];
 

@@ -17,6 +17,8 @@ export default function ImagesPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isInitialLoading,
+    isFetching,
   } = useGetAlerts({});
 
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
@@ -38,12 +40,18 @@ export default function ImagesPage() {
     [alerts]
   );
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <Skeleton key={i} className="h-64 w-full" />
-        ))}
+      <div className="flex flex-col gap-4">
+        <div className="space-y-2">
+          <Skeleton className="h-9 w-64" />
+          <Skeleton className="h-5 w-96" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <Skeleton key={i} className="h-64 w-full" />
+          ))}
+        </div>
       </div>
     );
   }

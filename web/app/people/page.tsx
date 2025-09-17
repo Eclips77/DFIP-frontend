@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useGetPeople } from "@/hooks/use-api";
 import { PersonCard } from "@/components/person-card";
 import { PersonGallery } from "@/components/person-gallery";
@@ -10,23 +11,31 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 
 export default function PeoplePage() {
-  const { data: people, isLoading, isError } = useGetPeople();
+  const { data: people, isLoading, isError, isInitialLoading, isFetching } = useGetPeople();
+  const searchParams = useSearchParams();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Check for personId in URL params
+  useEffect(() => {
+    const personIdFromUrl = searchParams.get('personId');
+    if (personIdFromUrl) {
+      setSelectedPersonId(personIdFromUrl);
+      setSearchQuery(personIdFromUrl.slice(0, 12)); // Pre-fill search with person ID
+    }
+  }, [searchParams]);
 
   // Filter people based on search query
   const filteredPeople = people?.filter(person => 
     person.personId.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">People</h1>
-          <p className="text-muted-foreground">
-            Browse all detected individuals in the system.
-          </p>
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-5 w-96 mt-2" />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

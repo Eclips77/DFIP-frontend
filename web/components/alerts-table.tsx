@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useInView } from "react-intersection-observer";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { useGetAlerts, type Alert } from "@/hooks/use-api";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -46,6 +47,7 @@ interface AlertsTableProps {
 
 export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
   const debouncedSearch = useDebounce(messageSearch ?? "", 300);
+  const router = useRouter();
 
   const {
     data,
@@ -55,6 +57,8 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isInitialLoading,
+    isFetching,
   } = useGetAlerts({
     page_size: limit,
     level,
@@ -78,7 +82,7 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
   }, [data]);
 
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return (
       <div className="space-y-2">
         {Array.from({ length: limit ?? 10 }).map((_, index) => (
@@ -132,10 +136,36 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
                 {formatDateTime(alert.time)}
               </TableCell>
               <TableCell className="text-muted-foreground hidden lg:table-cell">
-                {alert.cameraId || "—"}
+                {alert.cameraId ? (
+                  <button
+                    className="hover:text-green-400 hover:underline transition-colors cursor-pointer"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      router.push(`/cameras?cameraId=${alert.cameraId}`);
+                    }}
+                    title="Click to view this camera's details"
+                  >
+                    {alert.cameraId}
+                  </button>
+                ) : (
+                  "—"
+                )}
               </TableCell>
               <TableCell className="font-mono text-xs text-muted-foreground hidden lg:table-cell">
-                {alert.personId ? alert.personId.slice(0, 12).concat("...") : "—"}
+                {alert.personId ? (
+                  <button
+                    className="hover:text-blue-400 hover:underline transition-colors cursor-pointer"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      router.push(`/people?personId=${alert.personId}`);
+                    }}
+                    title="Click to view this person's details"
+                  >
+                    {alert.personId.slice(0, 12).concat("...")}
+                  </button>
+                ) : (
+                  "—"
+                )}
               </TableCell>
               <TableCell className="text-center">
                 {alert.imageId ? (

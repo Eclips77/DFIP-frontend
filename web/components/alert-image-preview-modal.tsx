@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useGetImageMetadata, Alert } from "@/hooks/use-api";
 import { formatDateTime } from "@/lib/date-utils";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 interface AlertImagePreviewModalProps {
@@ -46,6 +47,7 @@ export function AlertImagePreviewModal({
   onOpenChange 
 }: AlertImagePreviewModalProps) {
   const { data: imageMetadata, isLoading, isError } = useGetImageMetadata(imageId);
+  const router = useRouter();
 
   if (!imageId) return null;
 
@@ -125,7 +127,17 @@ export function AlertImagePreviewModal({
                           <Icon icon={Camera} className="w-4 h-4" />
                           Camera ID:
                         </span>
-                        <span className="font-mono">{alert.cameraId || "N/A"}</span>
+                        {alert.cameraId ? (
+                          <button
+                            className="font-mono hover:text-blue-400 hover:underline transition-colors cursor-pointer"
+                            onClick={() => router.push(`/cameras?cameraId=${alert.cameraId}`)}
+                            title="Click to view this camera's details"
+                          >
+                            {alert.cameraId}
+                          </button>
+                        ) : (
+                          <span className="font-mono">N/A</span>
+                        )}
                       </div>
                       {alert.personId && (
                         <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
@@ -133,7 +145,13 @@ export function AlertImagePreviewModal({
                             <Icon icon={User} className="w-4 h-4" />
                             Person ID:
                           </span>
-                          <span className="font-mono text-xs">{alert.personId}</span>
+                          <button
+                            className="font-mono text-xs hover:text-blue-400 hover:underline transition-colors cursor-pointer"
+                            onClick={() => router.push(`/people?personId=${alert.personId}`)}
+                            title="Click to view this person's details"
+                          >
+                            {alert.personId}
+                          </button>
                         </div>
                       )}
                     </div>
