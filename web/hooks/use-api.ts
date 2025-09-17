@@ -249,3 +249,102 @@ export const useGetImageMetadata = (imageId: string | null) => {
     enabled: !!imageId,
   });
 };
+
+// --- People ---
+
+export type PersonSummary = {
+  personId: string;
+  alertCount: number;
+  firstSeen: string;
+  lastSeen: string;
+  imageIds: string[];
+  sampleImageId: string | null;
+};
+
+export type PersonImage = {
+  imageId: string;
+  alertTime: string;
+  cameraId: string;
+  alertLevel: string;
+  message: string;
+};
+
+const normalizePerson = (person: any): PersonSummary => {
+  const record = person as Record<string, unknown>;
+
+  return {
+    personId:
+      (record["personId"] as string | undefined) ??
+      (record["person_id"] as string | undefined) ??
+      "",
+    alertCount:
+      (record["alertCount"] as number | undefined) ??
+      (record["alert_count"] as number | undefined) ??
+      0,
+    firstSeen:
+      (record["firstSeen"] as string | undefined) ??
+      (record["first_seen"] as string | undefined) ??
+      "",
+    lastSeen:
+      (record["lastSeen"] as string | undefined) ??
+      (record["last_seen"] as string | undefined) ??
+      "",
+    imageIds:
+      (record["imageIds"] as string[] | undefined) ??
+      (record["image_ids"] as string[] | undefined) ??
+      [],
+    sampleImageId:
+      (record["sampleImageId"] as string | undefined) ??
+      (record["sample_image_id"] as string | undefined) ??
+      null,
+  };
+};
+
+const normalizePersonImage = (image: any): PersonImage => {
+  const record = image as Record<string, unknown>;
+
+  return {
+    imageId:
+      (record["imageId"] as string | undefined) ??
+      (record["image_id"] as string | undefined) ??
+      "",
+    alertTime:
+      (record["alertTime"] as string | undefined) ??
+      (record["alert_time"] as string | undefined) ??
+      "",
+    cameraId:
+      (record["cameraId"] as string | undefined) ??
+      (record["camera_id"] as string | undefined) ??
+      "",
+    alertLevel:
+      (record["alertLevel"] as string | undefined) ??
+      (record["alert_level"] as string | undefined) ??
+      "info",
+    message: (record["message"] as string | undefined) ?? "",
+  };
+};
+
+const fetchPeople = async (): Promise<PersonSummary[]> => {
+  const { data } = await api.get<any[]>("/api/v1/people");
+  return data.map(normalizePerson);
+};
+
+const fetchPersonImages = async (personId: string): Promise<PersonImage[]> => {
+  const { data } = await api.get<any[]>(`/api/v1/people/${personId}/images`);
+  return data.map(normalizePersonImage);
+};
+
+export const useGetPeople = () => {
+  return useQuery({
+    queryKey: ["people"],
+    queryFn: fetchPeople,
+  });
+};
+
+export const useGetPersonImages = (personId: string | null) => {
+  return useQuery({
+    queryKey: ["personImages", personId],
+    queryFn: () => fetchPersonImages(personId!),
+    enabled: !!personId,
+  });
+};

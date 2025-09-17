@@ -7,7 +7,7 @@ from loguru import logger
 
 from api.core.config import settings
 from api.db.mongodb_utils import connect_to_mongo, close_mongo_connection
-from api.routers import alerts, images, stats
+from api.routers import alerts, images, stats, people
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -50,6 +50,7 @@ app.add_middleware(
 app.include_router(alerts.router, prefix="/api/v1", tags=["Alerts"])
 app.include_router(images.router, prefix="/api/v1", tags=["Images"])
 app.include_router(stats.router, prefix="/api/v1", tags=["Stats"])
+app.include_router(people.router, prefix="/api/v1", tags=["People"])
 
 # --- Root Endpoint ---
 @app.get("/api/v1")
