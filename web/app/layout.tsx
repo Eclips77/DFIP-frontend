@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
-import ClientOnly from "@/components/client-only";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -34,13 +33,12 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="dark"
           enableSystem
+          disableTransitionOnChange
         >
           <QueryProvider>
             <div className="relative flex min-h-screen flex-col">
               <div className="flex">
-                <ClientOnly>
-                  <Sidebar />
-                </ClientOnly>
+                <Sidebar />
                 <div className="flex flex-1 flex-col">
                   <Topbar />
                   <main className="flex-1 p-4 md:p-8">{children}</main>

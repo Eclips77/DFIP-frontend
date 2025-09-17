@@ -29,8 +29,17 @@ const levelIcons = {
   warning: <ShieldCheck className="h-4 w-4 text-yellow-500" />,
 };
 
-export function AlertsTable() {
-  // For now, we are not using filters. We will add them later.
+import { useDebounce } from "@/hooks/use-debounce";
+
+interface AlertsTableProps {
+  limit?: number;
+  level?: string;
+  messageSearch?: string;
+}
+
+export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
+  const debouncedMessageSearch = useDebounce(messageSearch, 500);
+
   const {
     data,
     isLoading,
@@ -39,7 +48,11 @@ export function AlertsTable() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useGetAlerts({});
+  } = useGetAlerts({
+    page_size: limit ?? 20,
+    level: level,
+    message_search: debouncedMessageSearch,
+  });
 
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
@@ -68,65 +81,75 @@ export function AlertsTable() {
   }
 
   if (alerts.length === 0) {
-    return <div className="text-center text-muted-foreground">No alerts found.</div>
+    return <div className="text-center text-muted-foreground py-8">No alerts found.</div>
   }
 
+  const tableContent = (
+    <Table>
+      {!limit && (
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Level</TableHead>
+            <TableHead>Message</TableHead>
+            <TableHead>Time</TableHead>
+            <TableHead>Camera</TableHead>
+            <TableHead>Person ID</TableHead>
+            <TableHead className="text-center">Image</TableHead>
+          </TableRow>
+        </TableHeader>
+      )}
+      <TableBody>
+        {alerts.map((alert) => (
+          <TableRow key={alert.id} onClick={() => setSelectedAlert(alert)} className="cursor-pointer">
+            <TableCell>
+              <Badge variant={alert.level === 'alert' ? 'destructive' : 'secondary'} className="text-xs">
+                <div className="flex items-center gap-2">
+                    {levelIcons[alert.level]}
+                    <span>{alert.level}</span>
+                </div>
+              </Badge>
+            </TableCell>
+            <TableCell className="font-medium">{alert.message}</TableCell>
+            <TableCell className="text-muted-foreground hidden md:table-cell">
+              {new Date(alert.time).toLocaleString()}
+            </TableCell>
+            <TableCell className="text-muted-foreground hidden lg:table-cell">{alert.cameraId}</TableCell>
+            <TableCell className="font-mono text-xs text-muted-foreground hidden lg:table-cell">{alert.personId.substring(0, 12)}...</TableCell>
+            <TableCell className="text-center">
+              {alert.imageId && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent row click from firing
+                    setSelectedImageId(alert.imageId);
+                  }}
+                >
+                  <ImageIcon className="h-4 w-4" />
+                </Button>
+              )}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+
   return (
-    <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Level</TableHead>
-              <TableHead>Message</TableHead>
-              <TableHead>Time</TableHead>
-              <TableHead>Camera</TableHead>
-              <TableHead>Person ID</TableHead>
-              <TableHead className="text-center">Image</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {alerts.map((alert) => (
-              <TableRow key={alert.id} onClick={() => setSelectedAlert(alert)} className="cursor-pointer">
-                <TableCell>
-                  <Badge variant={alert.level === 'alert' ? 'destructive' : 'secondary'}>
-                    <div className="flex items-center gap-2">
-                        {levelIcons[alert.level]}
-                        <span>{alert.level}</span>
-                    </div>
-                  </Badge>
-                </TableCell>
-                <TableCell>{alert.message}</TableCell>
-                <TableCell>{new Date(alert.time).toLocaleString()}</TableCell>
-                <TableCell>{alert.cameraId}</TableCell>
-                <TableCell className="font-mono text-xs">{alert.personId.substring(0, 12)}...</TableCell>
-                <TableCell className="text-center">
-                  {alert.imageId && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent row click from firing
-                        setSelectedImageId(alert.imageId);
-                      }}
-                    >
-                      <ImageIcon className="h-4 w-4" />
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+    <>
+      {limit ? <div>{tableContent}</div> : <Card>{tableContent}</Card>}
 
-        <div ref={ref} className="flex justify-center p-4">
-            {isFetchingNextPage ? (
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            ) : !hasNextPage && alerts.length > 0 ? (
-                <p className="text-sm text-muted-foreground">End of results.</p>
-            ) : null}
-        </div>
+      {!limit && (
+          <div ref={ref} className="flex justify-center p-4">
+              {isFetchingNextPage ? (
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              ) : !hasNextPage && alerts.length > 0 ? (
+                  <p className="text-sm text-muted-foreground">End of results.</p>
+              ) : null}
+          </div>
+      )}
 
-        <ImagePreviewModal
+      <ImagePreviewModal
             imageId={selectedImageId}
             isOpen={!!selectedImageId}
             onOpenChange={(isOpen) => !isOpen && setSelectedImageId(null)}

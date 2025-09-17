@@ -11,6 +11,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+node_modules/
 
 # IDEs and editors
 .idea/
@@ -20,3 +21,4 @@ venv.bak/
 
 # Other
 .DS_Store
+npm_output.log
