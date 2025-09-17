@@ -48,6 +48,11 @@ interface AlertsTableProps {
 export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
   const debouncedSearch = useDebounce(messageSearch ?? "", 300);
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const {
     data,
@@ -97,8 +102,20 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
     return <div className="text-destructive">Error: {message}</div>;
   }
 
-  if (alerts.length === 0) {
+  // Only show "No alerts found" if we're not loading and have actually fetched data
+  if (isClient && !isInitialLoading && !isFetching && data && alerts.length === 0) {
     return <div className="text-muted-foreground">No alerts found.</div>;
+  }
+
+  // Show loading skeleton if we don't have data yet or not on client
+  if (!isClient || !data || alerts.length === 0) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: limit ?? 10 }).map((_, index) => (
+          <Skeleton key={index} className="h-12 w-full" />
+        ))}
+      </div>
+    );
   }
 
   const tableContent = (
