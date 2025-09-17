@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # --- Collection & Bucket Names ---
     # Allows overriding collection names if they differ from the defaults.
     ALERTS_COLLECTION_NAME: str = "Event"
-    GRIDFS_BUCKET_NAME: str = "Photo_starage"
+    GRIDFS_BUCKET_NAME: str = "Photo_storage"
 
     # Pydantic settings configuration
     model_config = SettingsConfigDict(

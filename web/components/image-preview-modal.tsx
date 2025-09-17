@@ -27,10 +27,10 @@ export function ImagePreviewModal({ imageId, isOpen, onOpenChange }: ImagePrevie
           {imageMetadata && (
             <div className="relative h-full w-full">
                 <Image
-                    src={`/api/v1/images/${imageMetadata.id}/bytes`}
+                    src={`http://localhost:8000/api/v1/images/by-image-id/${imageId}/thumbnail`}
                     alt={`Alert image ${imageId}`}
-                    layout="fill"
-                    objectFit="contain"
+                    fill
+                    style={{ objectFit: "contain" }}
                 />
             </div>
           )}
