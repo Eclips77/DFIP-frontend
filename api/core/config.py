@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     # --- API Server Configuration ---
     API_PORT: int = 8000
     # A comma-separated string of allowed origins, e.g., "http://localhost:3000,https://my-app.com"
-    ALLOWED_ORIGINS: str = "http://localhost:3000"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,https://dfip-frontend-966e801161c5.herokuapp.com"
 
     # --- Collection & Bucket Names ---
     # Allows overriding collection names if they differ from the defaults.
