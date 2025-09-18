@@ -67,7 +67,7 @@ jobs:
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           buildpack: "heroku/python"
           usedocker: false
-          dontuseforce: true
+          dontuseforce: false
 
   deploy-frontend:
     name: Deploy Next.js Frontend
@@ -122,7 +122,7 @@ jobs:
           appdir: "web"
           buildpack: "heroku/nodejs"
           usedocker: false
-          dontuseforce: true
+          dontuseforce: false
 
   post-deploy:
     name: Post-deployment checks
