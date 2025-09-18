@@ -28,6 +28,26 @@ async def connect_to_mongo():
         # TODO: Add auto-detection logic here if required by the spec.
         # For now, we use the names from the settings.
         db.alerts_collection = db.db[settings.ALERTS_COLLECTION_NAME]
+        
+        # Log connection details for debugging
+        logger.info(f"Connected to MongoDB database: {settings.MONGO_DB}")
+        logger.info(f"GridFS bucket name: {settings.GRIDFS_BUCKET_NAME}")
+        logger.info(f"Alerts collection: {settings.ALERTS_COLLECTION_NAME}")
+        
+        # Test GridFS bucket
+        try:
+            collections = await db.db.list_collection_names()
+            logger.info(f"Available collections: {collections}")
+            
+            files_collection = f"{settings.GRIDFS_BUCKET_NAME}.files"
+            if files_collection in collections:
+                file_count = await db.db[files_collection].count_documents({})
+                logger.info(f"Total files in GridFS ({files_collection}): {file_count}")
+            else:
+                logger.warning(f"GridFS files collection '{files_collection}' not found!")
+                
+        except Exception as e:
+            logger.error(f"Error testing GridFS bucket: {str(e)}")
 
         logger.info("Successfully connected to MongoDB.")
 

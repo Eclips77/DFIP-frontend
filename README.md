@@ -22,7 +22,128 @@ This project was built by Jules, an AI software engineer.
 
 ---
 
-## Project Overview
+## 🚀 DFIP Dashboard - Face Recognition Security System
+
+## 📋 Overview
+A comprehensive dashboard for monitoring face recognition alerts, managing cameras, and tracking people across a security system. Built with FastAPI backend and Next.js frontend.
+
+## 🏗️ Architecture
+- **Backend**: FastAPI + MongoDB + GridFS (Image Storage)
+- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS + React Query
+- **Deployment**: Render Cloud Platform
+
+## 🚀 Quick Deployment Guide
+
+### For Complete Deployment Instructions:
+👉 **See [RENDER_DEPLOYMENT_GUIDE.md](./RENDER_DEPLOYMENT_GUIDE.md)** for detailed step-by-step instructions
+
+### For Links and Resources:
+👉 **See [RENDER_LINKS_AND_RESOURCES.md](./RENDER_LINKS_AND_RESOURCES.md)** for URLs, environment variables, and debugging
+
+### Quick Start:
+1. **Push to Git**: `git push origin fix-stats-gather-bug`
+2. **Create Render Account**: https://render.com
+3. **Deploy API Service** with environment variables
+4. **Deploy Frontend Service** pointing to API
+5. **Update CORS settings** in API to allow frontend domain
+
+## 🛠️ Local Development
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- MongoDB Atlas account
+
+### Backend Setup
+```bash
+cd api
+python -m venv venv
+venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+python -m uvicorn main:app --reload
+```
+
+### Frontend Setup
+```bash
+cd web
+npm install
+npm run dev
+```
+
+## 📊 Features
+- 📈 **Real-time Statistics Dashboard**
+- 🚨 **Alert Management with Filtering**
+- 📷 **Camera Monitoring & People Tracking**
+- 🖼️ **Image Gallery with Metadata**
+- 🔄 **Auto-refresh with React Query Caching**
+- 📱 **Responsive Design for Mobile/Desktop**
+
+## 🌐 Production URLs
+- **Frontend**: https://dfip-frontend.onrender.com
+- **API**: https://dfip-api.onrender.com
+- **API Health**: https://dfip-api.onrender.com/health
+
+## 🔧 Tech Stack
+
+### Backend
+- FastAPI
+- Motor (MongoDB async driver)
+- Pydantic for data validation
+- GridFS for image storage
+- Loguru for logging
+
+### Frontend
+- Next.js 15 with App Router
+- TypeScript
+- Tailwind CSS
+- React Query for state management
+- Radix UI components
+- Lucide React icons
+
+## 📁 Project Structure
+```
+DFIP-frontend/
+├── api/                 # FastAPI Backend
+│   ├── main.py         # Main FastAPI app
+│   ├── routers/        # API endpoints
+│   ├── models/         # Pydantic models
+│   ├── db/             # Database utilities
+│   └── requirements.txt
+├── web/                # Next.js Frontend
+│   ├── app/            # App Router pages
+│   ├── components/     # React components
+│   ├── hooks/          # React hooks (API calls)
+│   ├── lib/            # Utilities and API client
+│   └── package.json
+├── render.yaml         # Render deployment config
+└── README.md
+```
+
+## 🐛 Debugging
+
+### Check API Health
+```bash
+curl https://dfip-api.onrender.com/health
+```
+
+### Check Frontend Health
+```bash
+curl https://dfip-frontend.onrender.com/api/health
+```
+
+### Common Issues
+- **CORS Errors**: Update `ALLOWED_ORIGINS` in API environment variables
+- **No Data Loading**: Check `NEXT_PUBLIC_API_URL` in frontend environment
+- **MongoDB Errors**: Verify `MONGO_URI` in API environment
+
+## 📞 Support
+For deployment issues, check the detailed guides:
+- [Complete Deployment Guide](./RENDER_DEPLOYMENT_GUIDE.md)
+- [Debug Production Issues](./DEBUG_PRODUCTION.md)
+- [Links and Resources](./RENDER_LINKS_AND_RESOURCES.md)
+
+---
+**Status**: ✅ Ready for Production Deployment
 
 This dashboard provides a beautiful and performant interface for exploring event and image data stored in MongoDB. It is designed to be a stand-alone application that connects to an existing MongoDB database in a read-only capacity. The focus is on providing a polished UI with tasteful animations and a clear, intuitive presentation of data.
 

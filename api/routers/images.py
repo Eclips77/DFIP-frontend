@@ -4,6 +4,7 @@ from fastapi.responses import StreamingResponse
 from bson import ObjectId
 from PIL import Image
 from motor.motor_asyncio import AsyncIOMotorGridFSBucket
+from loguru import logger
 
 from api.models.image import GridFSFileSchema
 from api.db.mongodb import db, get_db
@@ -20,11 +21,17 @@ async def get_image_metadata_by_image_id(image_id: str, db_session = Depends(get
     Retrieve GridFS file metadata using the custom `image_id` from the alert.
     """
     try:
+        logger.info(f"Looking for image with image_id: {image_id}")
         file_doc = await db_session.db[f"{settings.GRIDFS_BUCKET_NAME}.files"].find_one({"metadata.image_id": image_id})
         if file_doc is None:
+            logger.warning(f"Image with image_id '{image_id}' not found")
             raise HTTPException(status_code=404, detail=f"Image with image_id '{image_id}' not found.")
+        logger.info(f"Found image metadata for image_id: {image_id}")
         return file_doc
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"Error retrieving image metadata for image_id {image_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error retrieving image metadata: {str(e)}")
 
 @router.get("/images/{file_id}/bytes")
@@ -33,19 +40,73 @@ async def stream_image_bytes(file_id: str, db_session = Depends(get_db)):
     Stream the full-size image bytes directly from GridFS.
     """
     if not ObjectId.is_valid(file_id):
+        logger.warning(f"Invalid file ID format: {file_id}")
         raise HTTPException(status_code=400, detail="Invalid file ID.")
 
-    gridfs_bucket = db_session.fs
     try:
-        gridfs_stream = await gridfs_bucket.open_download_stream(ObjectId(file_id))
+        logger.info(f"Attempting to stream image bytes for file_id: {file_id}")
+        
+        # Check if GridFS bucket is properly initialized
+        if db_session.fs is None:
+            logger.error("GridFS bucket is not initialized")
+            raise HTTPException(status_code=500, detail="GridFS bucket not available")
+        
+        gridfs_stream = await db_session.fs.open_download_stream(ObjectId(file_id))
+        
         # Determine content type based on filename extension
-        content_type = "image/jpeg" # Default
+        content_type = "image/jpeg"  # Default
         if gridfs_stream.filename and (gridfs_stream.filename.lower().endswith(".png")):
             content_type = "image/png"
-
+        
+        logger.info(f"Successfully opened stream for file_id: {file_id}, content_type: {content_type}")
         return StreamingResponse(gridfs_stream, media_type=content_type)
-    except Exception: # Should be more specific, e.g., NoFile
-        raise HTTPException(status_code=404, detail="Image file not found.")
+        
+    except Exception as e:
+        logger.error(f"Error streaming image bytes for file_id {file_id}: {str(e)} (type: {type(e).__name__})")
+        if "NoFile" in str(type(e)) or "not found" in str(e).lower():
+            raise HTTPException(status_code=404, detail="Image file not found.")
+        else:
+            raise HTTPException(status_code=500, detail=f"Error streaming image: {str(e)}")
+
+@router.get("/images/debug/gridfs-info")
+async def debug_gridfs_info(db_session = Depends(get_db)):
+    """
+    Debug endpoint to check GridFS configuration and bucket status.
+    """
+    try:
+        # Check if database is connected
+        db_info = {
+            "database_name": db_session.db.name if db_session.db else None,
+            "gridfs_bucket_name": settings.GRIDFS_BUCKET_NAME,
+            "gridfs_bucket_initialized": db_session.fs is not None,
+        }
+        
+        # Check if collections exist
+        collections = await db_session.db.list_collection_names()
+        db_info["available_collections"] = collections
+        
+        # Check GridFS files collection
+        files_collection_name = f"{settings.GRIDFS_BUCKET_NAME}.files"
+        chunks_collection_name = f"{settings.GRIDFS_BUCKET_NAME}.chunks"
+        
+        db_info["gridfs_files_collection_exists"] = files_collection_name in collections
+        db_info["gridfs_chunks_collection_exists"] = chunks_collection_name in collections
+        
+        # Count files in GridFS
+        if files_collection_name in collections:
+            file_count = await db_session.db[files_collection_name].count_documents({})
+            db_info["total_files_in_gridfs"] = file_count
+            
+            # Get sample file info
+            sample_file = await db_session.db[files_collection_name].find_one({})
+            db_info["sample_file_structure"] = sample_file
+        
+        logger.info(f"GridFS debug info: {db_info}")
+        return db_info
+        
+    except Exception as e:
+        logger.error(f"Error getting GridFS debug info: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting debug info: {str(e)}")
 
 @router.get("/images/{file_id}/thumb")
 async def stream_image_thumbnail(file_id: str, db_session = Depends(get_db)):
