@@ -60,17 +60,30 @@ async def create_indexes():
         await db.alerts_collection.create_index([("level", 1)])
         await db.alerts_collection.create_index([("camera_id", 1)])
         await db.alerts_collection.create_index([("person_id", 1)])
-        # Index for image_id, without enforcing uniqueness as there might be duplicate references
-        await db.alerts_collection.create_index([("image_id", 1)], sparse=True)
+        
+        # Check if image_id index already exists before creating
+        existing_indexes = await db.alerts_collection.list_indexes().to_list(length=None)
+        index_names = [idx.get('name') for idx in existing_indexes]
+        
+        if "image_id_1" not in index_names:
+            # Index for image_id, without enforcing uniqueness as there might be duplicate references
+            await db.alerts_collection.create_index([("image_id", 1)], sparse=True)
+        
         # Text index for message search
         await db.alerts_collection.create_index([("message", "text")])
 
         # Index for the GridFS files collection to quickly find images by their custom ID
         fs_files_collection = db.db[f"{settings.GRIDFS_BUCKET_NAME}.files"]
-        await fs_files_collection.create_index([("metadata.image_id", 1)], unique=True, sparse=True)
+        
+        # Check if GridFS index exists
+        gridfs_indexes = await fs_files_collection.list_indexes().to_list(length=None)
+        gridfs_index_names = [idx.get('name') for idx in gridfs_indexes]
+        
+        if "metadata.image_id_1" not in gridfs_index_names:
+            await fs_files_collection.create_index([("metadata.image_id", 1)], unique=True, sparse=True)
 
         logger.info("Database indexes are in place.")
     except Exception as e:
         logger.error(f"An error occurred while creating indexes: {e}")
-        # Depending on the strategy, you might want to raise here as well
-        raise
+        # Continue without raising to allow the server to start
+        logger.warning("Continuing without creating indexes...")
