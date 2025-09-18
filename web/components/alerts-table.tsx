@@ -10,6 +10,7 @@ import { useGetAlerts, type Alert } from "@/hooks/use-api";
 import { useDebounce } from "@/hooks/use-debounce";
 import { formatDateTime } from "@/lib/date-utils";
 import { AlertImagePreviewModal } from "./alert-image-preview-modal";
+import { ClientOnly } from "@/components/client-only";
 import {
   Table,
   TableBody,
@@ -48,11 +49,6 @@ interface AlertsTableProps {
 export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
   const debouncedSearch = useDebounce(messageSearch ?? "", 300);
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const {
     data,
@@ -102,19 +98,37 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
     return <div className="text-destructive">Error: {message}</div>;
   }
 
-  // Only show "No alerts found" if we're not loading and have actually fetched data
-  if (isClient && !isInitialLoading && !isFetching && data && alerts.length === 0) {
-    return <div className="text-muted-foreground">No alerts found.</div>;
-  }
-
-  // Show loading skeleton if we don't have data yet or not on client
-  if (!isClient || !data || alerts.length === 0) {
+  // Show loading first
+  if (isInitialLoading) {
     return (
       <div className="space-y-2">
         {Array.from({ length: limit ?? 10 }).map((_, index) => (
           <Skeleton key={index} className="h-12 w-full" />
         ))}
       </div>
+    );
+  }
+
+  // Show error if any
+  if (isError) {
+    const message = error ? String(error) : "Failed to load alerts";
+    return <div className="text-destructive">Error: {message}</div>;
+  }
+
+  // Show no alerts found only after data is loaded
+  if (data && alerts.length === 0) {
+    return (
+      <ClientOnly 
+        fallback={
+          <div className="space-y-2">
+            {Array.from({ length: limit ?? 10 }).map((_, index) => (
+              <Skeleton key={index} className="h-12 w-full" />
+            ))}
+          </div>
+        }
+      >
+        <div className="text-muted-foreground">No alerts found.</div>
+      </ClientOnly>
     );
   }
 

@@ -3,10 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion, useSpring, useTransform } from "framer-motion";
 import { ArrowUpRight, type LucideIcon } from "lucide-react";
+import { ClientOnly } from "@/components/client-only";
 import {
   useEffect,
   useRef,
-  useState,
 } from "react";
 
 // Custom hook for the count-up animation
@@ -53,16 +53,13 @@ export function KpiCard({
 }: KpiCardProps) {
   const animatedValue = useCountUp(value || 0);
   const IconComponent = icon;
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   return (
     <Card className="relative overflow-hidden">
       <div className="absolute right-0 top-0 -z-10 text-muted/20">
-        {isClient && <IconComponent className="h-32 w-32" />}
+        <ClientOnly>
+          <IconComponent className="h-32 w-32" />
+        </ClientOnly>
       </div>
       <CardHeader className="pb-2">
         <CardTitle className="text-md font-medium text-muted-foreground">
@@ -70,9 +67,11 @@ export function KpiCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <motion.div className="text-4xl font-bold tracking-tighter" suppressHydrationWarning>
-          {animatedValue}
-        </motion.div>
+        <ClientOnly fallback={<div className="text-4xl font-bold tracking-tighter">0</div>}>
+          <motion.div className="text-4xl font-bold tracking-tighter">
+            {animatedValue}
+          </motion.div>
+        </ClientOnly>
         <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
           {trend && (
             <span
