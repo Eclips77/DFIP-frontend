@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useGetPeople } from "@/hooks/use-api";
 import { PersonCard } from "@/components/person-card";
@@ -10,7 +10,10 @@ import { Users, Search } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 
-export default function PeoplePage() {
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
+function PeoplePageContent() {
   const { data: people, isError, isInitialLoading } = useGetPeople();
   const searchParams = useSearchParams();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
@@ -126,5 +129,27 @@ export default function PeoplePage() {
         }}
       />
     </div>
+  );
+}
+
+export default function PeoplePage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
+            <Icon icon={Users} className="h-6 w-6" />
+            People
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }, (_, i) => (
+              <Skeleton key={i} className="h-48 w-full rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
+      <PeoplePageContent />
+    </Suspense>
   );
 }

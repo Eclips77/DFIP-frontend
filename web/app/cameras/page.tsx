@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useGetCameras } from "@/hooks/use-api";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,10 @@ import { Loader2, Camera, Search, AlertCircle } from "lucide-react";
 import { CameraCard } from "@/components/camera-card";
 import { CameraPeopleGallery } from "@/components/camera-people-gallery";
 
-export default function CamerasPage() {
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
+function CamerasPageContent() {
   const { data: cameras, isError, isInitialLoading } = useGetCameras();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
@@ -115,5 +118,31 @@ export default function CamerasPage() {
         }}
       />
     </div>
+  );
+}
+
+export default function CamerasPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
+            <Icon icon={Camera} className="h-6 w-6" />
+            Cameras
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }, (_, i) => (
+              <div key={i} className="bg-card border rounded-lg p-4 animate-pulse">
+                <div className="h-4 bg-gray-300 rounded mb-2"></div>
+                <div className="h-8 bg-gray-300 rounded mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
+      <CamerasPageContent />
+    </Suspense>
   );
 }
