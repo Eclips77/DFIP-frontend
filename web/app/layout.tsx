@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
-import { ClientOnlyGlobalLoadingIndicator } from "@/components/client-only-global-loading";
 
 const fontSans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
