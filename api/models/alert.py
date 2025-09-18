@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Union
 from api.models.common import PyObjectId
 
 class AlertSchema(BaseModel):
@@ -9,10 +9,10 @@ class AlertSchema(BaseModel):
     This model is used for validation and serialization.
     """
     id: PyObjectId = Field(alias="_id")
-    person_id: str = Field(...)
-    time: datetime = Field(...)
-    level: Literal["alert multiple", "info", "warning","alert"] = Field(...)
-    image_id: str = Field(...)
+    person_id: Union[str, int] = Field(...)
+    time: datetime = Field(alias="Processing_time")  # Use Processing_time from MongoDB
+    level: Literal["high", "medium", "low", "alert multiple", "info", "warning", "alert"] = Field(...)
+    image_id: Union[str, int] = Field(...)
     camera_id: str = Field(...)
     message: str = Field(...)
 
@@ -28,11 +28,11 @@ class AlertSchema(BaseModel):
         json_schema_extra = {
             "example": {
                 "id": "68c971856e8881dad7769617",
-                "person_id": "67862bc752f285bb212702bd25e737c7e011a3cf7f096b5c17ff3d48c6c6ac4e",
+                "person_id": 1001,
                 "time": "2025-09-16T14:17:22.494Z",
-                "level": "alert",
-                "image_id": "5af89eae-1785-52a9-8414-07f66bc6d7a1",
-                "camera_id": "123",
-                "message": "Person detected by camera 123.",
+                "level": "high",
+                "image_id": 2001,
+                "camera_id": "CAM001",
+                "message": "Person detected at main entrance",
             }
         }
