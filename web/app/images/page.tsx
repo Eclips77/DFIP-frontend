@@ -11,14 +11,12 @@ import { ImagePreviewModal } from "@/components/image-preview-modal";
 export default function ImagesPage() {
   const {
     data,
-    isLoading,
     isError,
     error,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isInitialLoading,
-    isFetching,
   } = useGetAlerts({});
 
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);

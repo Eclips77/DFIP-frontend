@@ -11,7 +11,7 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 
 export default function PeoplePage() {
-  const { data: people, isLoading, isError, isInitialLoading, isFetching } = useGetPeople();
+  const { data: people, isError, isInitialLoading } = useGetPeople();
   const searchParams = useSearchParams();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -100,7 +100,7 @@ export default function PeoplePage() {
         <div className="flex h-[40vh] flex-col items-center justify-center gap-4">
           <Icon icon={Search} className="h-12 w-12 text-muted-foreground" />
           <p className="text-muted-foreground">
-            No people found matching "{searchQuery}"
+            No people found matching &quot;{searchQuery}&quot;
           </p>
         </div>
       ) : (

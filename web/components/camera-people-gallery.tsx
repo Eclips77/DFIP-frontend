@@ -17,11 +17,10 @@ interface CameraPeopleGalleryProps {
 
 interface PersonCardProps {
   person: CameraPerson;
-  cameraId: string;
   onClick?: () => void;
 }
 
-function PersonCard({ person, cameraId, onClick }: PersonCardProps) {
+function PersonCard({ person, onClick }: PersonCardProps) {
   const shortPersonId = person.personId.slice(0, 12) + "...";
   
   return (
@@ -136,7 +135,6 @@ export function CameraPeopleGallery({ cameraId, isOpen, onOpenChange }: CameraPe
                     <PersonCard 
                       key={`${person.personId}-${index}`} 
                       person={person}
-                      cameraId={cameraId!}
                       onClick={() => setSelectedPersonId(person.personId)}
                     />
                   ))}

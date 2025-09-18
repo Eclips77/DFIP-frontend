@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   Drawer,
@@ -31,7 +30,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Image as ImageIcon, Info, Loader2, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Info, Loader2, ShieldCheck } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 
 const levelIcons: Record<string, ReactNode> = {
@@ -52,14 +51,12 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
 
   const {
     data,
-    isLoading,
     isError,
     error,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isInitialLoading,
-    isFetching,
   } = useGetAlerts({
     page_size: limit,
     level,

@@ -10,7 +10,7 @@ import { CameraCard } from "@/components/camera-card";
 import { CameraPeopleGallery } from "@/components/camera-people-gallery";
 
 export default function CamerasPage() {
-  const { data: cameras, isLoading, isError, isInitialLoading, isFetching } = useGetCameras();
+  const { data: cameras, isError, isInitialLoading } = useGetCameras();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
