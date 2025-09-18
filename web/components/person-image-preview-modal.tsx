@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Calendar, Camera, AlertTriangle, User, Clock, MapPin } from "lucide-react";
+import { Loader2, Camera, AlertTriangle, User, Clock, MapPin } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { useGetImageMetadata, PersonImage } from "@/hooks/use-api";
 import { formatDateTime } from "@/lib/date-utils";
