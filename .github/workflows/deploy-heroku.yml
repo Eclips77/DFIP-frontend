@@ -37,6 +37,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+          export PATH="/usr/local/lib/heroku/bin:$PATH"
+          echo "/usr/local/lib/heroku/bin" >> $GITHUB_PATH
+
+      - name: Verify Heroku CLI installation
+        run: |
+          export PATH="/usr/local/lib/heroku/bin:$PATH"
+          heroku --version
+          heroku auth:whoami || echo "Not logged in yet"
+
       - name: Run tests (if available)
         working-directory: api
         run: |
@@ -56,6 +68,7 @@ jobs:
           appdir: "api"
           buildpack: "heroku/python"
           usedocker: false
+          dontuseforce: true
 
   deploy-frontend:
     name: Deploy Next.js Frontend
@@ -89,6 +102,18 @@ jobs:
           NODE_ENV: production
           NEXT_PUBLIC_API_URL: https://${{ secrets.HEROKU_API_APP_NAME }}.herokuapp.com
 
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+          export PATH="/usr/local/lib/heroku/bin:$PATH"
+          echo "/usr/local/lib/heroku/bin" >> $GITHUB_PATH
+
+      - name: Verify Heroku CLI installation
+        run: |
+          export PATH="/usr/local/lib/heroku/bin:$PATH"
+          heroku --version
+          heroku auth:whoami || echo "Not logged in yet"
+
       - name: Deploy Frontend to Heroku
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
@@ -98,6 +123,7 @@ jobs:
           appdir: "web"
           buildpack: "heroku/nodejs"
           usedocker: false
+          dontuseforce: true
 
   post-deploy:
     name: Post-deployment checks
