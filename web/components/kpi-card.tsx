@@ -2,13 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion, useSpring, useTransform } from "framer-motion";
+import { ArrowUpRight, type LucideIcon } from "lucide-react";
 import {
-  cloneElement,
-  isValidElement,
   useEffect,
   useRef,
-  type ReactElement,
-  type ReactNode,
+  useState,
 } from "react";
 
 // Custom hook for the count-up animation
@@ -36,12 +34,10 @@ function useCountUp(end: number) {
   return rounded;
 }
 
-import { ArrowUpRight } from "lucide-react";
-
 interface KpiCardProps {
   title: string;
-  value: number;
-  icon: ReactNode;
+  value: number | undefined;
+  icon: LucideIcon;
   description?: string;
   trend?: string;
   trendDirection?: "up" | "down";
@@ -55,16 +51,18 @@ export function KpiCard({
   trend,
   trendDirection = "up",
 }: KpiCardProps) {
-  const animatedValue = useCountUp(value);
+  const animatedValue = useCountUp(value || 0);
+  const IconComponent = icon;
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <Card className="relative overflow-hidden">
       <div className="absolute right-0 top-0 -z-10 text-muted/20">
-        {icon &&
-          isValidElement(icon) &&
-          cloneElement(icon as ReactElement<{ className?: string }>, {
-            className: "h-32 w-32",
-          })}
+        {isClient && <IconComponent className="h-32 w-32" />}
       </div>
       <CardHeader className="pb-2">
         <CardTitle className="text-md font-medium text-muted-foreground">
@@ -72,7 +70,7 @@ export function KpiCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <motion.div className="text-4xl font-bold tracking-tighter">
+        <motion.div className="text-4xl font-bold tracking-tighter" suppressHydrationWarning>
           {animatedValue}
         </motion.div>
         <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">

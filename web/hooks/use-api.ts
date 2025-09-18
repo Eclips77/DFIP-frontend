@@ -48,6 +48,8 @@ export const useGetStats = () => {
   return useQuery({
     queryKey: ["stats"],
     queryFn: fetchStats,
+    staleTime: 5 * 60 * 1000, // 5 minutes - stats can be slightly stale
+    gcTime: 15 * 60 * 1000, // 15 minutes
   });
 };
 
@@ -176,6 +178,8 @@ export const useGetAlerts = (filters: AlertFilters = {}) => {
       return allPages.length + 1;
     },
     initialPageParam: 1,
+    staleTime: 2 * 60 * 1000, // 2 minutes - alerts are more dynamic
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
@@ -247,6 +251,8 @@ export const useGetImageMetadata = (imageId: string | null) => {
     queryKey: ["imageMetadata", imageId],
     queryFn: () => fetchImageMetadata(imageId!),
     enabled: !!imageId,
+    staleTime: 60 * 60 * 1000, // 1 hour - image metadata never changes
+    gcTime: 2 * 60 * 60 * 1000, // 2 hours
   });
 };
 
@@ -338,6 +344,8 @@ export const useGetPeople = () => {
   return useQuery({
     queryKey: ["people"],
     queryFn: fetchPeople,
+    staleTime: 15 * 60 * 1000, // 15 minutes - people list doesn't change often
+    gcTime: 60 * 60 * 1000, // 1 hour
   });
 };
 
@@ -346,5 +354,72 @@ export const useGetPersonImages = (personId: string | null) => {
     queryKey: ["personImages", personId],
     queryFn: () => fetchPersonImages(personId!),
     enabled: !!personId,
+    staleTime: 10 * 60 * 1000, // 10 minutes - person images change rarely
+    gcTime: 30 * 60 * 1000, // 30 minutes
+  });
+};
+
+// ===== CAMERAS API =====
+
+export type CameraSummary = {
+  cameraId: string;
+  totalDetections: number;
+  uniquePeople: number;
+  firstDetection: string | null;
+  lastDetection: string | null;
+};
+
+export type CameraPerson = {
+  personId: string;
+  detectionCount: number;
+  firstDetection: string | null;
+  lastDetection: string | null;
+};
+
+const normalizeCameraSummary = (camera: any): CameraSummary => {
+  return {
+    cameraId: camera.camera_id || camera.cameraId,
+    totalDetections: camera.total_detections || camera.totalDetections,
+    uniquePeople: camera.unique_people || camera.uniquePeople,
+    firstDetection: camera.first_detection || camera.firstDetection,
+    lastDetection: camera.last_detection || camera.lastDetection,
+  };
+};
+
+const normalizeCameraPerson = (person: any): CameraPerson => {
+  return {
+    personId: person.person_id || person.personId,
+    detectionCount: person.detection_count || person.detectionCount,
+    firstDetection: person.first_detection || person.firstDetection,
+    lastDetection: person.last_detection || person.lastDetection,
+  };
+};
+
+const fetchCameras = async (): Promise<CameraSummary[]> => {
+  const { data } = await api.get<any[]>("/api/v1/cameras");
+  return data.map(normalizeCameraSummary);
+};
+
+const fetchCameraPeople = async (cameraId: string): Promise<CameraPerson[]> => {
+  const { data } = await api.get<any[]>(`/api/v1/cameras/${cameraId}/people`);
+  return data.map(normalizeCameraPerson);
+};
+
+export const useGetCameras = () => {
+  return useQuery({
+    queryKey: ["cameras"],
+    queryFn: fetchCameras,
+    staleTime: 15 * 60 * 1000, // 15 minutes - cameras list is quite stable
+    gcTime: 60 * 60 * 1000, // 1 hour
+  });
+};
+
+export const useGetCameraPeople = (cameraId: string | null) => {
+  return useQuery({
+    queryKey: ["cameraPeople", cameraId],
+    queryFn: () => fetchCameraPeople(cameraId!),
+    enabled: Boolean(cameraId),
+    staleTime: 10 * 60 * 1000, // 10 minutes - camera people list is quite stable
+    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 };

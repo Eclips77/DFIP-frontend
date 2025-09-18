@@ -6,6 +6,7 @@ import { Loader2, Calendar, Camera, AlertTriangle, User, Clock, MapPin } from "l
 import { Icon } from "@/components/ui/icon";
 import { useGetImageMetadata, PersonImage } from "@/hooks/use-api";
 import { formatDateTime } from "@/lib/date-utils";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 interface PersonImagePreviewModalProps {
@@ -17,6 +18,7 @@ interface PersonImagePreviewModalProps {
 
 export function PersonImagePreviewModal({ image, personId, isOpen, onOpenChange }: PersonImagePreviewModalProps) {
   const { data: imageMetadata, isLoading, isError } = useGetImageMetadata(image?.imageId || null);
+  const router = useRouter();
   
   const shortPersonId = personId ? personId.slice(0, 12) + "..." : "";
   
@@ -129,7 +131,13 @@ export function PersonImagePreviewModal({ image, personId, isOpen, onOpenChange 
                       <Icon icon={Camera} className="w-4 h-4 text-muted-foreground" />
                       <div>
                         <div className="text-xs text-muted-foreground">Camera</div>
-                        <div className="text-sm">{image.cameraId}</div>
+                        <button
+                          className="text-sm hover:text-blue-400 hover:underline transition-colors cursor-pointer"
+                          onClick={() => router.push(`/cameras?cameraId=${image.cameraId}`)}
+                          title="Click to view this camera's details"
+                        >
+                          {image.cameraId}
+                        </button>
                       </div>
                     </div>
 
