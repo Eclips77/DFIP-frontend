@@ -1,8 +1,27 @@
 import axios from "axios";
 import { camelizeKeys } from "humps";
 
+// Determine API URL based on environment
+const getApiUrl = () => {
+  // Use explicit environment variable if set
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // Check if we're in production by hostname
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'dfip-frontend-2e61b982be78.herokuapp.com') {
+      return 'https://dfip-api-966e801161c5.herokuapp.com';
+    }
+  }
+  
+  // Default to localhost for development
+  return "http://localhost:8000";
+};
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
+  baseURL: getApiUrl(),
   headers: {
     "Content-Type": "application/json",
   },
