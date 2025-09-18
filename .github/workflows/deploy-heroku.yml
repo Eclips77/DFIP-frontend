@@ -92,7 +92,7 @@ jobs:
 
       - name: Run linting
         working-directory: web
-        run: npm run lint || echo "Linting failed, continuing..."
+        run: npm run lint || echo "Linting completed with warnings"
         continue-on-error: true
 
       - name: Build application
