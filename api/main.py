@@ -54,7 +54,17 @@ app.include_router(people.router, prefix="/api/v1", tags=["People"])
 app.include_router(cameras.router, prefix="/api/v1", tags=["Cameras"])
 
 # --- Root Endpoint ---
-@app.get("/api/v1")
+@app.get("/")
 def read_root():
+    """A simple endpoint to confirm the API is running."""
+    return {"status": "ok", "message": "Welcome to the Animated Dashboard API!"}
+
+@app.get("/health")
+def health_check():
+    """Health check endpoint for monitoring and deployment verification."""
+    return {"status": "healthy", "service": "DFIP API"}
+
+@app.get("/api/v1")
+def read_api_root():
     """A simple endpoint to confirm the API is running."""
     return {"status": "ok", "message": "Welcome to the Animated Dashboard API!"}
