@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useGetPeople } from "@/hooks/use-api";
 import { PersonCard } from "@/components/person-card";
@@ -10,8 +10,8 @@ import { Users, Search } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 
-export default function PeoplePage() {
-  const { data: people, isLoading, isError, isInitialLoading, isFetching } = useGetPeople();
+function PeoplePageContent() {
+  const { data: people, isError, isInitialLoading } = useGetPeople();
   const searchParams = useSearchParams();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -126,5 +126,27 @@ export default function PeoplePage() {
         }}
       />
     </div>
+  );
+}
+
+export default function PeoplePage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Icon icon={Users} className="h-6 w-6" />
+            <h1 className="text-2xl font-bold">People</h1>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-48 rounded-lg" />
+          ))}
+        </div>
+      </div>
+    }>
+      <PeoplePageContent />
+    </Suspense>
   );
 }
