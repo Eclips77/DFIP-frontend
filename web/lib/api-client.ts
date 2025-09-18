@@ -8,12 +8,9 @@ const getApiUrl = () => {
     return process.env.NEXT_PUBLIC_API_URL;
   }
   
-  // Check if we're in production by hostname
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    if (hostname === 'dfip-frontend-2e61b982be78.herokuapp.com') {
-      return 'https://dfip-api-966e801161c5.herokuapp.com';
-    }
+  // For production deployment on Heroku, use the known API URL
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://dfip-api-966e801161c5.herokuapp.com';
   }
   
   // Default to localhost for development
