@@ -52,7 +52,7 @@ export default function RootLayout({
                   </div>
                 </main>
               </div>
-              <ClientOnlyGlobalLoadingIndicator />
+              {/* <ClientOnlyGlobalLoadingIndicator /> */}
               <Toaster position="top-right" />
             </div>
           </QueryProvider>
