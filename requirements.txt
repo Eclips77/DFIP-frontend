@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+motor
+pydantic[email]
+pydantic-settings
+python-dotenv
+Pillow
+python-multipart
+# For ObjectId support in Pydantic models
+loguru
+
+# Testing
+pytest
+httpx
+pytest-asyncio
