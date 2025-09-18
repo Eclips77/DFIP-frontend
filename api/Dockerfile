@@ -1,28 +1,40 @@
-# Use an official Python runtime as a parent image
+# Use Python 3.11 slim image
 FROM python:3.11-slim
 
-# Set the working directory in the container
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+# Set the working directory
 WORKDIR /app
 
-# Install system dependencies that might be needed by Python packages
-# For example, Pillow needs libjpeg
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev \
+    libpng-dev \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the requirements file into the container at /app
-COPY ./requirements.txt /app/requirements.txt
+# Copy and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the application code
+COPY . .
 
-# Copy the rest of the application's code into the container at /app
-COPY . /app
+# Create a non-root user
+RUN adduser --disabled-password --gecos '' appuser
+RUN chown -R appuser:appuser /app
+USER appuser
 
-# Expose the port the app runs on
+# Expose the port
 EXPOSE 8000
 
-# Define the command to run the application
-# This will start the Uvicorn server, making the API accessible.
-# --host 0.0.0.0 is crucial to allow connections from outside the container.
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD python -c "import requests; requests.get('http://localhost:8000/health', timeout=5)"
+
+# Run the application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

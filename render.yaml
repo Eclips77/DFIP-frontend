@@ -1,0 +1,47 @@
+services:
+  # API Service (FastAPI Backend)
+  - type: web
+    name: dfip-api
+    runtime: python
+    repo: https://github.com/Eclips77/DFIP-frontend.git
+    buildCommand: "cd api && pip install -r requirements.txt"
+    startCommand: "cd api && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: MONGO_URI
+        value: mongodb+srv://arieltanami122_db_user:OHod6QgGER7wp09F@facedb.k2ycus.mongodb.net/?retryWrites=true&w=majority&appName=facedb
+      - key: MONGO_DB
+        value: face_identity
+      - key: ALLOWED_ORIGINS
+        value: https://dfip-frontend.onrender.com
+      - key: ALERTS_COLLECTION_NAME
+        value: Event
+      - key: GRIDFS_BUCKET_NAME
+        value: Photo_storage
+      - key: NODE_ENV
+        value: production
+
+  # Frontend Service (Next.js)
+  - type: web
+    name: dfip-frontend
+    runtime: node
+    repo: https://github.com/Eclips77/DFIP-frontend.git
+    buildCommand: "cd web && npm ci && npm run build"
+    startCommand: "cd web && npm start"
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 18.19.0
+      - key: NEXT_PUBLIC_API_URL
+        value: https://dfip-api.onrender.com
+      - key: NODE_ENV
+        value: production
+
+# Optional: Database (if you want to use Render's PostgreSQL instead of MongoDB Atlas)
+# databases:
+#   - name: dfip-db
+#     plan: starter
