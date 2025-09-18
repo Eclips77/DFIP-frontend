@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useGetCameras } from "@/hooks/use-api";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,10 @@ import { Icon } from "@/components/ui/icon";
 import { Loader2, Camera, Search, AlertCircle } from "lucide-react";
 import { CameraCard } from "@/components/camera-card";
 import { CameraPeopleGallery } from "@/components/camera-people-gallery";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function CamerasPage() {
-  const { data: cameras, isLoading, isError, isInitialLoading, isFetching } = useGetCameras();
+function CamerasPageContent() {
+  const { data: cameras, isError, isInitialLoading } = useGetCameras();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
@@ -115,5 +116,27 @@ export default function CamerasPage() {
         }}
       />
     </div>
+  );
+}
+
+export default function CamerasPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Icon icon={Camera} className="h-6 w-6" />
+            <h1 className="text-2xl font-bold">Cameras</h1>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-32 rounded-lg" />
+          ))}
+        </div>
+      </div>
+    }>
+      <CamerasPageContent />
+    </Suspense>
   );
 }
