@@ -3,14 +3,11 @@ services:
   - type: web
     name: dfip-api
     runtime: python
-    repo: https://github.com/Eclips77/DFIP-frontend.git
-    buildCommand: "cd api && pip install -r requirements.txt"
-    startCommand: "cd api && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    buildCommand: pip install -r api/requirements.txt
+    startCommand: cd api && python -m uvicorn main:app --host 0.0.0.0 --port $PORT
     plan: starter
     healthCheckPath: /health
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.9
       - key: MONGO_URI
         value: mongodb+srv://arieltanami122_db_user:OHod6QgGER7wp09F@facedb.k2ycus.mongodb.net/?retryWrites=true&w=majority&appName=facedb
       - key: MONGO_DB
@@ -28,14 +25,11 @@ services:
   - type: web
     name: dfip-frontend
     runtime: node
-    repo: https://github.com/Eclips77/DFIP-frontend.git
-    buildCommand: "cd web && npm ci && npm run build"
-    startCommand: "cd web && npm start"
+    buildCommand: cd web && npm install && npm run build
+    startCommand: cd web && npm start
     plan: starter
     healthCheckPath: /api/health
     envVars:
-      - key: NODE_VERSION
-        value: 18.19.0
       - key: NEXT_PUBLIC_API_URL
         value: https://dfip-api.onrender.com
       - key: NODE_ENV
