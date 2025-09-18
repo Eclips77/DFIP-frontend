@@ -1,11 +1,12 @@
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from api.core.config import settings
+from api.db.mongodb import get_db
 from api.db.mongodb_utils import connect_to_mongo, close_mongo_connection
 from api.routers import alerts, images, stats, people, cameras
 
@@ -60,9 +61,21 @@ def read_root():
     return {"status": "ok", "message": "Welcome to the Animated Dashboard API!"}
 
 @app.get("/health")
-def health_check():
-    """Health check endpoint for monitoring and deployment verification."""
-    return {"status": "healthy", "service": "DFIP API"}
+async def health_check(db_session=Depends(get_db)):
+    """
+    Health check endpoint for monitoring and deployment verification.
+    It checks the database connection and returns the status.
+    """
+    try:
+        # The 'ping' command is cheap and does not require auth.
+        await db_session.client.admin.command('ping')
+        return {"status": "healthy", "service": "DFIP API", "db": "connected"}
+    except Exception as e:
+        logger.error(f"Health check failed: database connection error: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail="database connection failed"
+        )
 
 @app.get("/api/v1")
 def read_api_root():
