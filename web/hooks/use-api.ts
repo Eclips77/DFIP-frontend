@@ -67,12 +67,16 @@ const normalizeTimeSeries = (
   point: StatsOverTimeApiResponse[number]
 ): StatsOverTimeResponse[number] => {
   const record = point as Record<string, unknown>;
+  
+  const timeBucket = (record["timeBucket"] as string | undefined) ??
+                     (record["_id"] as string | undefined) ??
+                     "";
+  
+  // Validate the date string
+  const isValidDate = timeBucket && !isNaN(new Date(timeBucket).getTime());
 
   return {
-    timeBucket:
-      (record["timeBucket"] as string | undefined) ??
-      (record["_id"] as string | undefined) ??
-      "",
+    timeBucket: isValidDate ? timeBucket : new Date().toISOString(),
     count: (record["count"] as number | undefined) ?? 0,
   };
 };

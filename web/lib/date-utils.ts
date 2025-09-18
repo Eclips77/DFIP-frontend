@@ -1,8 +1,11 @@
 const DEFAULT_LOCALE = "en-US";
 const DEFAULT_TIME_ZONE = "UTC";
 
-const toDate = (input: string | number | Date): Date =>
-  input instanceof Date ? input : new Date(input);
+const toDate = (input: string | number | Date): Date => {
+  if (input instanceof Date) return input;
+  const date = new Date(input);
+  return isNaN(date.getTime()) ? new Date() : date;
+};
 
 const monthDayFormatter = new Intl.DateTimeFormat(DEFAULT_LOCALE, {
   month: "short",
