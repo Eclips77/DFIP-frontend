@@ -18,6 +18,9 @@ type CustomTooltipProps = {
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length && label) {
+    const date = new Date(label);
+    const formattedDate = isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    
     return (
       <div className="rounded-lg border bg-background p-2 shadow-sm">
         <div className="grid grid-cols-2 gap-2">
@@ -26,7 +29,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
               Date
             </span>
             <span className="font-bold text-muted-foreground">
-              {new Date(label).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              {formattedDate}
             </span>
           </div>
           <div className="flex flex-col">
@@ -51,7 +54,10 @@ export function AlertsChart() {
 
   // Format date for the X-axis tick
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     })
