@@ -13,7 +13,7 @@ services:
       - key: MONGO_DB
         value: face_identity
       - key: ALLOWED_ORIGINS
-        value: https://dfip-frontend.onrender.com
+        value: https://dfip-app1.onrender.com,https://dfip-frontend.onrender.com
       - key: ALERTS_COLLECTION_NAME
         value: Event
       - key: GRIDFS_BUCKET_NAME

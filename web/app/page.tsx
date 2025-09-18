@@ -18,6 +18,15 @@ import {
 
 export default function OverviewPage() {
   const { data: stats, isLoading, isError, error } = useGetStats();
+  
+  // Debug logging
+  console.log('Dashboard state:', {
+    stats,
+    isLoading,
+    isError,
+    error,
+    apiUrl: process.env.NEXT_PUBLIC_API_URL
+  });
 
   const kpiData = [
     {
