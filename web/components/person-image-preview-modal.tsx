@@ -6,6 +6,7 @@ import { Loader2, Camera, AlertTriangle, User, Clock, MapPin } from "lucide-reac
 import { Icon } from "@/components/ui/icon";
 import { useGetImageMetadata, PersonImage } from "@/hooks/use-api";
 import { formatDateTime } from "@/lib/date-utils";
+import { getImageThumbnailUrl } from "@/lib/api-client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -57,7 +58,7 @@ export function PersonImagePreviewModal({ image, personId, isOpen, onOpenChange 
               <div className="space-y-4">
                 <div className="relative aspect-square bg-white/5 rounded-lg overflow-hidden">
                   <Image
-                    src={`http://localhost:8000/api/v1/images/by-image-id/${image.imageId}/thumbnail`}
+                    src={getImageThumbnailUrl(image.imageId)}
                     alt={`Alert image from ${image.cameraId}`}
                     fill
                     style={{ objectFit: "contain" }}

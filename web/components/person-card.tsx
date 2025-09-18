@@ -6,6 +6,7 @@ import { Calendar, Camera, AlertTriangle } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { PersonSummary } from "@/hooks/use-api";
 import { formatDateTime } from "@/lib/date-utils";
+import { getImageThumbnailUrl } from "@/lib/api-client";
 import Image from "next/image";
 
 interface PersonCardProps {
@@ -28,7 +29,7 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
             <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
               {person.sampleImageId ? (
                 <Image
-                  src={`http://localhost:8000/api/v1/images/by-image-id/${person.sampleImageId}/thumbnail`}
+                  src={getImageThumbnailUrl(person.sampleImageId)}
                   alt={`Person ${shortPersonId}`}
                   fill
                   style={{ objectFit: "cover" }}

@@ -37,3 +37,8 @@ api.interceptors.response.use((response) => {
 });
 
 export default api;
+
+// Helper function to get image thumbnail URL
+export const getImageThumbnailUrl = (imageId: string) => {
+  return `${getApiUrl()}/api/v1/images/by-image-id/${imageId}/thumbnail`;
+};

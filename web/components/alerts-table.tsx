@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useGetAlerts, type Alert } from "@/hooks/use-api";
 import { useDebounce } from "@/hooks/use-debounce";
 import { formatDateTime } from "@/lib/date-utils";
+import { getImageThumbnailUrl } from "@/lib/api-client";
 import { AlertImagePreviewModal } from "./alert-image-preview-modal";
 import {
   Table,
@@ -193,7 +194,7 @@ export function AlertsTable({ limit, level, messageSearch }: AlertsTableProps) {
                     }}
                   >
                     <Image
-                      src={`http://localhost:8000/api/v1/images/by-image-id/${alert.imageId}/thumbnail`}
+                      src={getImageThumbnailUrl(alert.imageId)}
                       alt={`Alert image`}
                       fill
                       className="object-cover"

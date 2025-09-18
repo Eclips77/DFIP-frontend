@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/components/ui/icon";
+import { getImageThumbnailUrl } from "@/lib/api-client";
 import { 
   Loader2, 
   Calendar, 
@@ -91,7 +92,7 @@ export function AlertImagePreviewModal({
                 </h3>
                 <div className="relative flex-1 bg-black/5 rounded-lg overflow-hidden min-h-[300px]">
                   <Image
-                    src={`http://localhost:8000/api/v1/images/by-image-id/${imageId}/thumbnail`}
+                    src={getImageThumbnailUrl(imageId)}
                     alt={`Alert image ${imageId}`}
                     fill
                     className="object-contain"

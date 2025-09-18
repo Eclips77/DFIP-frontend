@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useGetPersonImages, PersonImage } from "@/hooks/use-api";
 import { PersonImagePreviewModal } from "@/components/person-image-preview-modal";
 import { formatDateTime } from "@/lib/date-utils";
+import { getImageThumbnailUrl } from "@/lib/api-client";
 import Image from "next/image";
 
 interface PersonGalleryProps {
@@ -35,7 +36,7 @@ function ImageCard({ image, onClick }: ImageCardProps) {
     >
       <div className="relative aspect-square">
         <Image
-          src={`http://localhost:8000/api/v1/images/by-image-id/${image.imageId}/thumbnail`}
+          src={getImageThumbnailUrl(image.imageId)}
           alt={`Alert from ${image.cameraId}`}
           fill
           style={{ objectFit: "cover" }}
